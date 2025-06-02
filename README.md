@@ -6,8 +6,6 @@ cd fungal_project
 mkdir raw_data trimmed_data qc_reports
 mv *_R1_001.fastq.gz *_R2_001.fastq.gz raw_data/
 
-
-
 # Quality Control and Trimming (fastp)
 conda install -c bioconda fastp
 cd raw_data
@@ -19,9 +17,7 @@ do
         -O ../trimmed_data/${base}_R2_trimmed.fastq.gz \
         -h ../qc_reports/${base}_fastp.html -j ../qc_reports/${base}_fastp.json
 done
-fastp -i *_R1.fastq.gz -I *_R2.fastq.gz \
-      -o clean_R1.fastq.gz -O clean_R2.fastq.gz \
-      -h report.html -j report.json
+fastp -i *_R1.fastq.gz -I *_R2.fastq.gz -o clean_R1.fastq.gz -O clean_R2.fastq.gz -h report.html -j report.json
 
 # Mapping to Reference Genome (BWA + Samtools)
 # Index Reference
@@ -42,8 +38,42 @@ samtools sort -o sorted_${bam} $bam
 samtools index sorted_${bam}
 
 # Variant Calling (bcftools)
+conda install -c bioconda bcftools
+
+# Create combined pileup
+samtools mpileup -uf reference/ref_genome.fasta aligned_bam/*_sorted.bam | \
+    bcftools call -mv -Oz -o variants.vcf.gz
+
+# Index VCF
+bcftools index variants.vcf.gz
+
+# Call variants (from previous alignment)
+bcftools mpileup -f ref_genome.fasta aligned_bam/*.bam | bcftools call -mv -Oz -o all_samples.vcf.gz
+
+# Filter variants
+bcftools filter -e 'QUAL<30 || DP<10' all_samples.vcf.gz -Oz -o filtered.vcf.gz
+
+# Convert to PHYLIP
+vcftools --vcf filtered.vcf.gz --out snp_matrix --phylip
+
+# Build SNP tree
+fasttree -nt -gtr snp_matrix.phylip > snp_tree.nwk
 
 # Detect Housekeeping Genes & Resistance Genes
+# Create BLAST database
+makeblastdb -in reference/ref_genome.fasta -dbtype nucl -out blast_results/ref_db
+
+# Create query files
+cat > blast_resistance_genes.fa << 'EOF'
+>CYP51A
+ATGGCTGTATCAGTTCGTTTCTGCTGCTCG...
+>SdhB
+ATGGACGTGAAGTGGAGGTCAGGATTTTGAG...
+EOF
+
+# Run BLAST searches
+blastn -query blast_resistance_genes.fa -db blast_results/ref_db \
+       -out blast_results/resistance_blast.txt -evalue 1e-5 -outfmt 6
 
 # Use blastn to search genes
 makeblastdb -in ref_genome.fasta -dbtype nucl -out ref_db
