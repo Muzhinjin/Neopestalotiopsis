@@ -27,10 +27,37 @@ bwa index ref_genome.fasta
 
 cd ../trimmed_data
 mkdir ../aligned_bam
+for sample in 73_S419 80_S420 86_S421 93_S422
+do
+  echo "Aligning $sample"
+
+  bwa mem -t 4 GCNrosiarefgenome.fna \
+    ${sample}_clean_R1_001.fastq.gz \
+    ${sample}_clean_R2_001.fastq.gz | \
+  samtools view -bS - | \
+  samtools sort -o ${sample}_aligned_sorted.bam
+
+  samtools index ${sample}_aligned_sorted.bam
+done
+
 
 bwa mem -t 4 ../ref_genome.fasta \
     ${base}_R1_trimmed.fastq.gz ${base}_R2_trimmed.fastq.gz | \
     samtools view -Sb - > ../aligned_bam/${base}.bam
+
+# For singles 
+bwa mem GCNrosiarefgenome.fna 73_S419_clean_R1_001.fastq.gz 73_S419_clean_R2_001.fastq.gz > 73_S419_alignment.sam
+# Convert SAM to BAM
+samtools view -bS 73_S419_alignment.sam > 73_S419_alignment.bam
+
+# Sort the BAM file
+samtools sort 73_S419_alignment.bam -o 73_S419_alignment_sorted.bam
+
+# Index bam files
+samtools index 73_S419_alignment_sorted.bam
+
+
+    
 # Sort and Index
 
 cd ../aligned_bam
