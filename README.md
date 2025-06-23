@@ -97,6 +97,13 @@ ATGGCTGTATCAGTTCGTTTCTGCTGCTCG...
 >SdhB
 ATGGACGTGAAGTGGAGGTCAGGATTTTGAG...
 EOF
+>
+# Extract sequences
+
+/home/muzhinjin/tikafinal/ncbi-blast-2.15.0+/bin/makeblastdb -in 100contigs.fasta -dbtype nucl
+/home/muzhinjin/tikafinal/ncbi-blast-2.15.0+/bin/blastn -query NeopestalotroseITS.fasta -db 100contigs.fasta -outfmt 6 -out 100contigITS.tsv
+/home/muzhinjin/tikafinal/samtools-1.19.2/samtools faidx 100contigs.fasta
+/home/muzhinjin/tikafinal/samtools-1.19.2/samtools faidx 100contigs.fasta NODE_499_length_3025_cov_4728.818860:450-995 > 100cintigITS_raw.fasta
 
 # Run BLAST searches
 blastn -query blast_resistance_genes.fa -db blast_results/ref_db \
