@@ -104,6 +104,7 @@ EOF
 /home/muzhinjin/tikafinal/ncbi-blast-2.15.0+/bin/blastn -query NeopestalotroseITS.fasta -db 100contigs.fasta -outfmt 6 -out 100contigITS.tsv
 /home/muzhinjin/tikafinal/samtools-1.19.2/samtools faidx 100contigs.fasta
 /home/muzhinjin/tikafinal/samtools-1.19.2/samtools faidx 100contigs.fasta NODE_499_length_3025_cov_4728.818860:450-995 > 100cintigITS_raw.fasta
+cat 
 
 # Run BLAST searches
 blastn -query blast_resistance_genes.fa -db blast_results/ref_db \
@@ -146,6 +147,28 @@ ATGGCGCTGGTTGTTGGTTCTGATGTTGTTGATGCTGGTGTTGCTGCTGTTGCTGGTGCTGCTGGTGCTGGTGGTGCTGG
 
 >MDR1_Major_Facilitator_Superfamily_MDR
 ATGGTGCTGGTTGTTGCTGCTGCTGGTGTTGTTGTTGCTGGTCAGGTTGGTGCTGGTCAGGGTGTTGGTGGTCAGGGTCAGGGTGGTCAG
+
+# 1. FKS1 – β-1,3-glucan synthase (echinocandin resistance)
+wget -O FKS1.fasta "https://www.uniprot.org/uniprot/P38631.fasta"
+
+# 2. ERG27 – 3-keto-steroid reductase (fenhexamid resistance)
+wget -O ERG27.fasta "https://www.uniprot.org/uniprot/Q6CJC2.fasta"
+
+# 3. sdhB – Succinate dehydrogenase iron-sulfur subunit (SDHI resistance)
+wget -O sdhB.fasta "https://www.uniprot.org/uniprot/T1QD65.fasta"
+
+# 4. β‑tubulin (TUB2) – benzimidazole (MBC) resistance
+wget -O TUB2.fasta "https://www.uniprot.org/uniprot/P40904.fasta"
+
+# 5. Cyt b – Mitochondrial cytochrome b (QoI / azoxystrobin resistance)
+wget -O cytb.fasta "https://www.uniprot.org/uniprot/Q7YF16.fasta"
+
+# 6. CYP51 (also known as ERG11) – Azole/DMI fungicide resistance
+wget -O CYP51.fasta "https://www.uniprot.org/uniprot/Q4WNT5.fasta"
+
+# 7. HOG1 – Protein kinase (MAPK pathway, stress signaling)
+wget -O HOG1.fasta "https://www.uniprot.org/uniprot/A0A8H6BVP0.fasta"
+
 
 
   
